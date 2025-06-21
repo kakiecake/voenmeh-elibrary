@@ -3,15 +3,27 @@ import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import path from 'node:path';
 import hbs from 'hbs';
+import cookieParser from 'cookie-parser';
+import { ValidationPipe } from '@nestjs/common';
+import dotenv from 'dotenv';
 
-async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
-
-  hbs.registerPartials(path.join(__dirname, '..', 'partials'));
-  // app.engine('hbs', hbs.);
+const setupHbs = (app: NestExpressApplication) => {
+  app.set('view options', { layout: 'layout.hbs' });
+  hbs.registerPartials(path.join(__dirname, '..', 'views', 'partials'));
   app.useStaticAssets(path.join(__dirname, '..', 'public'));
   app.setBaseViewsDir(path.join(__dirname, '..', 'views'));
   app.setViewEngine('hbs');
+};
+
+async function bootstrap() {
+  dotenv.config();
+
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.use(cookieParser());
+
+  setupHbs(app);
 
   await app.listen(process.env.PORT ?? 8080);
 }

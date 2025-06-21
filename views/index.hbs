@@ -1,10 +1,7 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>{{ title }}</title>
-  </head>
-  <body>
-    <div class="text-red bg-slate-300">If the text is black, then tailwind works</div>
-  </body>
-</html>
+<div>
+    {{#if user}}
+        Welcome, {{ user.email }}!
+    {{else}}
+        Who are you? Try <a href="/login" class="text-blue-800">logging in</a>
+    {{/if}}
+</div>

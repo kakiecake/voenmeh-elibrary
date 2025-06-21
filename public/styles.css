@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+@keyframes shake-and-fade {
+  0% { 
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  25% { 
+    transform: translateX(-10px);
+  }
+  50% { 
+    transform: translateX(10px);
+  }
+  75% { 
+    transform: translateX(-5px);
+  }
+  100% { 
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-shake-and-fade {
+  animation: shake-and-fade 0.5s ease-in-out;
+}
