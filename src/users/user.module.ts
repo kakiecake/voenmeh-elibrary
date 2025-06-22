@@ -3,19 +3,17 @@ import { UserService } from './user.service';
 import { UserRepository } from './user.repository';
 import { UserController } from './users.controller';
 import { JwtModule } from '@nestjs/jwt';
-import { JWT_SECRET_SYMBOL } from './constants';
+import { AppConfig } from '../config';
+import { ConfigSymbol } from '../global.constants';
 
 @Module({
   imports: [
-    JwtModule.register({
-      secret: 'secret123',
+    JwtModule.registerAsync({
+      useFactory: (config: AppConfig) => ({ secret: config.jwtSecret }),
+      inject: [ConfigSymbol],
     }),
   ],
   controllers: [UserController],
-  providers: [
-    { provide: JWT_SECRET_SYMBOL, useValue: 'secret123' },
-    UserService,
-    UserRepository,
-  ],
+  providers: [UserService, UserRepository],
 })
 export class UserModule {}

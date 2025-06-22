@@ -5,7 +5,6 @@ import path from 'node:path';
 import hbs from 'hbs';
 import cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
-import dotenv from 'dotenv';
 
 const setupHbs = (app: NestExpressApplication) => {
   app.set('view options', { layout: 'layout.hbs' });
@@ -16,8 +15,6 @@ const setupHbs = (app: NestExpressApplication) => {
 };
 
 async function bootstrap() {
-  dotenv.config();
-
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
