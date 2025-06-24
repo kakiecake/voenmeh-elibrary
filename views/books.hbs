@@ -1,0 +1,16 @@
+<form id='search' class='flex flex-row ml-2 mt-2'>
+  <input
+    id='search-input'
+    name='q'
+    class='border rounded-md p-1 mr-1'
+    placeholder='Query'
+    {{#if query}}
+    value='{{query}}'
+    {{/if}}
+  >
+  <button
+    class='border rounded-md py-1 px-2 bg-blue-600 hover:bg-blue-800 cursor-pointer text-white'
+  >Search</button>
+</form>
+
+{{>book_list}}

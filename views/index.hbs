@@ -1,7 +1,12 @@
-<div>
-    {{#if user}}
-        Welcome, {{ user.email }}!
-    {{else}}
-        Who are you? Try <a href="/login" class="text-blue-800">logging in</a>
-    {{/if}}
-</div>
+{{#if user}}
+  <div>
+    Welcome,
+    {{user.email}}!
+  </div>
+  <a href="/books" class="text-blue-800">Search books</a>
+{{else}}
+  <div>
+    Who are you? Try
+    <a href='/login' class='text-blue-800'>logging in</a>
+  </div>
+{{/if}}

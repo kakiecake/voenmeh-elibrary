@@ -1,0 +1,10 @@
+<ul id="book-list">
+  {{#each books}}
+    <li key={{id}} class='flex flex-row mt-2 px-2 items-center'>
+      <a href='/books/{{id}}'>
+        {{title}}
+      </a>
+      <p class="ml-2 text-sm">{{yearCreated}}</p>
+    </li>
+  {{/each}}
+</ul>
