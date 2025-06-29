@@ -1,0 +1,8 @@
+{{#each selectedAuthors}}
+  <span key="{{id}}" class='selected-author-item rounded-lg bg-gray-100 border border-grey-300 px-2 py-.5 mr-2'>
+    <input type="hidden" name="id" value="{{id}}">
+    <input type="hidden" name="name" value="{{name}}">
+    {{name}}
+    <button class='remove-author' class="cursor-pointer" hx-on:click="removeAuthor('{{ id }}')">×</button>
+  </span>
+{{/each}}

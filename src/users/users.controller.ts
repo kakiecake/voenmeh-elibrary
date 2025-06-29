@@ -7,6 +7,7 @@ import { AUTH_TOKEN_COOKIE_NAME } from './constants';
 import { AuthorizedUser, UserDecorator } from './user.decorator';
 import { AuthGuard } from './auth.guard';
 import { Protected } from './auth.decorator';
+import { USER_ROLES } from './types';
 
 @UseGuards(AuthGuard)
 @Controller('/')
@@ -18,7 +19,10 @@ export class UserController {
     @UserDecorator() user: AuthorizedUser | undefined,
     @Res() res: Response,
   ) {
-    return res.render('index', { user });
+    return res.render('index', {
+      user,
+      isAdmin: user && user.role === USER_ROLES.Admin,
+    });
   }
 
   @Protected
@@ -27,7 +31,10 @@ export class UserController {
     @UserDecorator() user: AuthorizedUser | undefined,
     @Res() res: Response,
   ) {
-    return res.render('index', { user });
+    return res.render('index', {
+      user,
+      isAdmin: user && user.role === USER_ROLES.Admin,
+    });
   }
 
   @Get('/login')

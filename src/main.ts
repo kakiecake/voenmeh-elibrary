@@ -7,8 +7,9 @@ import cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
 
 const setupHbs = (app: NestExpressApplication) => {
-  app.set('view options', { layout: 'layout.hbs' });
   hbs.registerPartials(path.join(__dirname, '..', 'views', 'partials'));
+  hbs.registerHelper('json', (data) => JSON.stringify(data));
+
   app.useStaticAssets(path.join(__dirname, '..', 'public'));
   app.setBaseViewsDir(path.join(__dirname, '..', 'views'));
   app.setViewEngine('hbs');

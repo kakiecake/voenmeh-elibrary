@@ -1,0 +1,55 @@
+<form
+  id='book-creation-form'
+  class='flex flex-col border border-grey-300 rounded-md p-2 outline-none w-100 mx-auto mt-2'
+  hx-ext="json-enc"
+  hx-post="/books"
+  hx-params="title, description, yearCreated, authorIds, countryCode"
+  hx-vals="js:{ authorIds: getAuthorIds() }"
+>
+  <input
+    type='text'
+    name='title'
+    placeholder='Title'
+    class='border border-grey-100 rounded-md py-1 px-2 outline-none'
+  />
+
+  <textarea
+    name='description'
+    placeholder='Description'
+    class='border border-grey-100 rounded-md py-1 px-2 mt-2 outline-none'
+  ></textarea>
+  
+  <input
+    name="yearCreated"
+    type="number"
+    placeholder="Year"
+    class='border border-grey-100 rounded-md py-1 px-2 outline-none mt-2'
+  />
+
+  {{> author_selector}}
+
+  <input
+    name="countryCode"
+    max="4"
+    placeholder="RU"
+    class='border border-grey-100 rounded-md py-1 px-2 outline-none mt-2'
+  />
+
+  <button
+    type='submit'
+    class='rounded-md bg-blue-500 hover:bg-blue-800 text-white w-24 shadow-lg transition cursor-pointer mt-2'
+  >Submit</button>
+</form>
+
+<script>
+  function getAuthorIds() {
+    const ids = document
+      .querySelectorAll('.selected-author-item > input[name="id"]')
+      .values().map(x => parseInt(x.value)).toArray()
+    return ids
+  }
+
+  function removeAuthor(id) { 
+    document.querySelector(`.selected-author-item[key='${id}']`)?.remove();
+  }
+</script>

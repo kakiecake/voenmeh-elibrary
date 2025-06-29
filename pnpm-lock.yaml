@@ -41,6 +41,9 @@ importers:
       knex:
         specifier: ^3.1.0
         version: 3.1.0(pg@8.16.2)
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
       pg:
         specifier: ^8.16.2
         version: 8.16.2
@@ -90,6 +93,9 @@ importers:
       '@types/jest':
         specifier: ^29.5.14
         version: 29.5.14
+      '@types/lodash':
+        specifier: ^4.17.19
+        version: 4.17.19
       '@types/node':
         specifier: ^22.10.7
         version: 22.15.32
@@ -1237,6 +1243,9 @@ packages:
 
   '@types/jsonwebtoken@9.0.7':
     resolution: {integrity: sha512-ugo316mmTYBl2g81zDFnZ7cfxlut3o+/EQdaP7J8QN2kY6lJ22hmQYCK5EHcJHbrW+dkCGSCPgbG8JtYj6qSrg==}
+
+  '@types/lodash@4.17.19':
+    resolution: {integrity: sha512-NYqRyg/hIQrYPT9lbOeYc3kIRabJDn/k4qQHIXUpx88CBDww2fD15Sg5kbXlW86zm2XEW4g0QxkTI3/Kfkc7xQ==}
 
   '@types/methods@1.1.4':
     resolution: {integrity: sha512-ymXWVrDiCxTBE3+RIrrP533E70eA+9qu7zdWoHuOmGujkYtzf4HQF96b8nwHLqhuf4ykX61IGRIB38CC6/sImQ==}
@@ -5800,6 +5809,8 @@ snapshots:
   '@types/jsonwebtoken@9.0.7':
     dependencies:
       '@types/node': 22.15.32
+
+  '@types/lodash@4.17.19': {}
 
   '@types/methods@1.1.4': {}
 

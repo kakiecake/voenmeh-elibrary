@@ -3,7 +3,12 @@
     Welcome,
     {{user.email}}!
   </div>
-  <a href="/books" class="text-blue-800">Search books</a>
+  <div class="flex flex-col mt-2">
+    <a href='/books' class='text-blue-800'>Search books</a>
+    {{#if isAdmin}}
+      <a href='/admin' class='text-blue-800'>Add books</a>
+    {{/if}}
+  </div>
 {{else}}
   <div>
     Who are you? Try

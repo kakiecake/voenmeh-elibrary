@@ -1,0 +1,18 @@
+<ul class='author-list'>
+  {{#each authors}}
+    <li key="{{ id }}" class="author-item border border-gray-300 rounded-md p-1 mt-2">
+      <button
+        class="cursor-pointer"
+        hx-post="/authors"
+        hx-ext="json-enc"
+        hx-params="newAuthor, id, name"
+        hx-include="input[name='id'], input[name='name']"
+        hx-target="#author-selector-container"
+        hx-swap="outerHTML"
+        hx-vals='{ "newAuthor": { "id": "{{ id }}", "name": "{{ name }}" } }'
+      >
+        {{name}}
+      </button>
+    </li>
+  {{/each}}
+</ul>

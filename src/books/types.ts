@@ -3,7 +3,7 @@ export type Book = {
   title: string;
   description: string;
   country: string;
-  // author: Author;
+  authors: Author[];
   yearCreated: number;
   isbn?: string;
   listedAt: Date;
@@ -13,6 +13,7 @@ export type BookCreateDTO = {
   title: string;
   description: string;
   countryCode: string;
+  authorIds: number[];
   yearCreated: number;
   isbn?: string;
 };
@@ -27,10 +28,12 @@ export type DbBook = {
   title: string;
   description: string;
   countryCode: string;
-  // authorId: number;
   yearCreated: number;
   isbn?: string;
   listedAt: Date;
 };
 
-export type BookRepr = Omit<DbBook, 'countryCode'> & { country: string };
+export type BookRepr = Omit<DbBook, 'countryCode'> & {
+  country: string;
+  authors: { id: number; name: string }[];
+};
