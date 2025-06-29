@@ -36,8 +36,8 @@ export async function up(knex: Knex): Promise<void> {
     CREATE OR REPLACE FUNCTION books_search_vec_update() RETURNS trigger AS $$
     BEGIN
       NEW.search_vec := 
-        setweight(to_tsvector('english', COALESCE(NEW.title, '')), 'A') ||
-        setweight(to_tsvector('english', COALESCE(NEW.description, '')), 'B');
+        setweight(to_tsvector('russian', COALESCE(NEW.title, '')), 'A') ||
+        setweight(to_tsvector('russian', COALESCE(NEW.description, '')), 'B');
       RETURN NEW;
     END;
     $$ LANGUAGE plpgsql;
