@@ -5,6 +5,8 @@ import { UserController } from './users.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { AppConfig } from '../config';
 import { ConfigSymbol } from '../global.constants';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './auth.guard';
 
 @Module({
   imports: [
@@ -14,6 +16,10 @@ import { ConfigSymbol } from '../global.constants';
     }),
   ],
   controllers: [UserController],
-  providers: [UserService, UserRepository],
+  providers: [
+    UserService,
+    UserRepository,
+    { provide: APP_GUARD, useClass: AuthGuard },
+  ],
 })
 export class UserModule {}

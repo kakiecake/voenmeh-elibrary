@@ -6,36 +6,11 @@ import { Response } from 'express';
 import { AUTH_TOKEN_COOKIE_NAME } from './constants';
 import { AuthorizedUser, UserDecorator } from './user.decorator';
 import { AuthGuard } from './auth.guard';
-import { Protected } from './auth.decorator';
-import { USER_ROLES } from './types';
 
 @UseGuards(AuthGuard)
 @Controller('/')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
-  @Get('/')
-  testIndex(
-    @UserDecorator() user: AuthorizedUser | undefined,
-    @Res() res: Response,
-  ) {
-    return res.render('index', {
-      user,
-      isAdmin: user && user.role === USER_ROLES.Admin,
-    });
-  }
-
-  @Protected
-  @Get('/protected')
-  testProtected(
-    @UserDecorator() user: AuthorizedUser | undefined,
-    @Res() res: Response,
-  ) {
-    return res.render('index', {
-      user,
-      isAdmin: user && user.role === USER_ROLES.Admin,
-    });
-  }
 
   @Get('/login')
   getLoginPage(
@@ -48,12 +23,26 @@ export class UserController {
     res.render('login');
   }
 
+  @Post('/logout')
+  logout(@Res() res: Response) {
+    return res
+      .cookie(AUTH_TOKEN_COOKIE_NAME, '', {
+        sameSite: 'strict',
+        secure: true,
+        httpOnly: true,
+        maxAge: -9999,
+      })
+      .header('HX-Redirect', '/books')
+      .status(200)
+      .end();
+  }
+
   @Post('/login')
   async signIn(@Body() body: SignInDto, @Res() res: Response) {
     const authResult = await this.userService.signIn(body.email, body.password);
     if (!authResult) {
       return res.render('partials/auth-form', {
-        authError: 'Неверный логин/пароль epta',
+        authError: 'Неверный логин/пароль',
         email: body.email,
       });
     }

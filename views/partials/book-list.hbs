@@ -1,10 +1,28 @@
-<ul id="book-list">
-  {{#each books}}
-    <li key={{id}} class='flex flex-row mt-2 px-2 items-center'>
-      <a href='/books/{{id}}'>
-        {{title}}
-      </a>
-      <p class="ml-2 text-sm">{{yearCreated}}</p>
-    </li>
-  {{/each}}
-</ul>
+{{#each books}}
+  <a href="/books/{{ id }}">
+    <div class="py-2 px-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all flex flex-row justify-between">
+      <div class="flex flex-col">
+        <h2 class="text-gray-900 font-semibold mb-1">{{title}}</h1>
+        <h3 class="text-xs">{{ authors.[0].name }}</h3>
+      </div>
+      <div class="text-sm text-gray-500">{{ yearCreated }}</div>
+    </div>
+  </a>
+{{/each}}
+
+{{#if pagination.isEnd}}
+  {{#if partial}}
+    <button id="load-more-button" hx-swap-oob="delete"></button>
+  {{/if}}
+{{else}}
+  <button 
+    id="load-more-button"
+    hx-swap-oob="true"
+    class="cursor-pointer" 
+    hx-get="/books"
+    hx-vals='{ "q": "{{ query }}", "page": {{ pagination.nextPage }}, "partial": true }'
+    hx-params="q, partial, page"
+    hx-target="previous"
+    hx-swap="afterend"
+  >Еще</button>
+{{/if}}

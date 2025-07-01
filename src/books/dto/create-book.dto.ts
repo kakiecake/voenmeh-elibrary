@@ -5,7 +5,6 @@ import {
   IsNumber,
   IsPositive,
   MaxLength,
-  IsNumberString,
 } from 'class-validator';
 
 export class CreateBookDto {
@@ -19,8 +18,6 @@ export class CreateBookDto {
   @IsArray()
   authorIds: number[];
 
-  // @IsPositive()
-  // @IsNumber()
   @IsPositive()
   @Transform(({ value }) => parseInt(value as string))
   yearCreated: number;

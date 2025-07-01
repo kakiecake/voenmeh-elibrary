@@ -10,8 +10,15 @@ export class BookService {
     return await this.bookRepository.getBookById(id);
   }
 
-  async findBooks(query: string): Promise<Book[]> {
-    return await this.bookRepository.searchBooks(query);
+  async findBooks(
+    query: string,
+    pagination: { pageIndex: number; pageSize: number },
+  ): Promise<Book[]> {
+    return await this.bookRepository.searchBooks(
+      query,
+      pagination.pageSize * pagination.pageIndex,
+      pagination.pageSize,
+    );
   }
 
   async addBook(book: BookCreateDTO) {

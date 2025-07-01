@@ -6,13 +6,18 @@ import {
   ParseIntPipe,
   Post,
   Query,
+  Redirect,
   Res,
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { BookService } from './book.service';
 import { Response } from 'express';
 import { AuthorService } from './author.service';
-import { CreateBookDto } from './dto/create-book-dto';
+import { CreateBookDto } from './dto/create-book.dto';
+import { AuthorizedUser, UserDecorator } from '../users/user.decorator';
+import { SearchBooksQueryDto } from './dto/search-books.query';
+
+const API_PAGE_SIZE = 5;
 
 @Controller('/')
 export class BookController {
@@ -21,13 +26,33 @@ export class BookController {
     private readonly authorService: AuthorService,
   ) {}
 
+  @Redirect('/books')
+  @Get('/')
+  indexPage() {}
+
   @Get('/books')
-  async getBooksPage(
-    @Query('q') query: string | undefined,
+  async searchBooks(
+    @UserDecorator() user: AuthorizedUser | undefined,
+    @Query() query: SearchBooksQueryDto,
     @Res() res: Response,
   ) {
-    const books = await this.bookService.findBooks(query ?? '');
-    res.render('books', { query, books });
+    const books = await this.bookService.findBooks(query.q ?? '', {
+      pageIndex: query.page - 1,
+      pageSize: API_PAGE_SIZE,
+    });
+
+    const isEnd = books.length < API_PAGE_SIZE;
+    res.render(query.partial ? 'partials/book-list' : 'books', {
+      query: query.q,
+      books,
+      user,
+      partial: query.partial,
+      pagination: {
+        page: query.page,
+        isEnd,
+        nextPage: isEnd ? null : query.page + 1,
+      },
+    });
   }
 
   @Post('/books')

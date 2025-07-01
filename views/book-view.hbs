@@ -1,5 +1,11 @@
 <div>
   <h1>{{ title }}</h1>
   <p>{{ description }}</p>
+  <div>
+    <label>Авторы: </label>
+    {{#each authors}}
+      <span key="{{ id }}">{{ name }}</span>
+    {{/each}}
+  </div>
   <p>Год создания: {{ yearCreated }}</p>
 </div>

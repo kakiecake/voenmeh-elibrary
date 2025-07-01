@@ -1,16 +1,29 @@
-<form id='search' class='flex flex-row ml-2 mt-2'>
-  <input
-    id='search-input'
-    name='q'
-    class='border rounded-md p-1 mr-1'
-    placeholder='Query'
-    {{#if query}}
-    value='{{query}}'
-    {{/if}}
-  >
-  <button
-    class='border rounded-md py-1 px-2 bg-blue-600 hover:bg-blue-800 cursor-pointer text-white'
-  >Search</button>
-</form>
+{{> navbar}}
 
-{{>book_list}}
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+  <div class="mb-8">
+    <form action="/books" method="GET" class="flex gap-2">
+      <input 
+        type="text" 
+        class="flex-grow px-4 py-2 border border-gray-300 hover:border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        name='q'
+        class='border rounded-md p-1 mr-1'
+        placeholder='Название, ISBN или описание'
+        {{#if query}}
+        value='{{query}}'
+        {{/if}}
+      >
+      <button 
+        type="submit" 
+        class="px-6 py-2 cursor-pointer bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+      >
+        Поиск
+      </button>
+    </form>
+  </div>
+
+  <div id="book-list" class="mb-8 flex flex-col gap-2">
+    {{> book_list }}
+  </div>
+
+</div>
