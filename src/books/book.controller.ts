@@ -19,6 +19,7 @@ import { CreateBookDto } from './dto/create-book.dto';
 import { AuthorizedUser, UserDecorator } from '../users/user.decorator';
 import { SearchBooksQueryDto } from './dto/search-books.query';
 import { FileInterceptor } from '@nestjs/platform-express';
+import stream from 'node:stream';
 
 const API_PAGE_SIZE = 5;
 
@@ -193,5 +194,18 @@ export class BookController {
     const book = await this.bookService.getBookById(id);
     if (!book) return res.render('404', { message: 'Book not found' });
     res.render('book-view', book);
+  }
+
+  @Get('/books/:id/download')
+  async downloadBookFile(
+    @Param('id', new ParseIntPipe()) id: number,
+    @Res() res: Response,
+  ) {
+    const file = await this.bookService.getBookFile(id);
+    if (!file) return res.status(404).end();
+    res.setHeader('Content-Type', 'application/octet-stream');
+    res.setHeader('Content-Disposition', `attachment; filename="book.pdf"`);
+
+    stream.promises.pipeline(file, res).catch(() => res.end());
   }
 }
