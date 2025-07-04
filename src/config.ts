@@ -9,6 +9,7 @@ const appConfigSchema = z
     DB_DATABASE: z.string(),
     DB_PASSWORD: z.string(),
     JWT_SECRET: z.string(),
+    UPLOADS_FOLDER: z.string(),
   })
   .transform((x) => ({
     db: {
@@ -19,6 +20,7 @@ const appConfigSchema = z
       database: x.DB_DATABASE,
     },
     jwtSecret: x.JWT_SECRET,
+    uploadsFolder: x.UPLOADS_FOLDER,
   }));
 
 export type AppConfig = z.infer<typeof appConfigSchema>;

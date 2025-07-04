@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import knex, { Knex } from 'knex';
+import { Knex } from 'knex';
 import { DbSymbol } from '../global.constants';
 import { BookRepr, DbBook } from './types';
 
@@ -36,6 +36,13 @@ export class BookRepository {
     return book || null;
   }
 
+  async getBookFilePath(id: DbBook['id']): Promise<DbBook['filePath'] | null> {
+    const rows = await this.db('books')
+      .select<Pick<DbBook, 'filePath'>[]>('file_path AS filePath')
+      .where('id', id);
+    return rows.length > 0 ? rows[0].filePath : null;
+  }
+
   async searchBooks(
     query: string,
     offset: number,
@@ -53,16 +60,16 @@ export class BookRepository {
     return await this.db.raw(
       `with insert_books_cte as (
         insert into books
-          (title, description, year_created, country_code)
+          (title, description, year_created, country_code, file_path)
         values
-          (:title, :description, :yearCreated, :countryCode)
+          (:title, :description, :yearCreated, :countryCode, :filePath)
         returning id, listed_at
       ), insert_book_authors_cte as (
         insert into book_authors (book_id, author_id)
         select 
           id, 
           unnest(
-            array[${book.authorIds.map((_, i) => `:${i}::int`).join(', ')}]
+            array[${book.authorIds.map((_, i) => `:${i}::int`).join(', ')}]::int[]
           )
         from insert_books_cte
       )
@@ -72,6 +79,7 @@ export class BookRepository {
         description: book.description,
         yearCreated: book.yearCreated,
         countryCode: book.countryCode,
+        filePath: book.filePath,
         ...book.authorIds,
       },
     );

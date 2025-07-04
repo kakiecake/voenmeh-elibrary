@@ -9,6 +9,8 @@ import {
   Redirect,
   Res,
   UnprocessableEntityException,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { BookService } from './book.service';
 import { Response } from 'express';
@@ -16,6 +18,7 @@ import { AuthorService } from './author.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { AuthorizedUser, UserDecorator } from '../users/user.decorator';
 import { SearchBooksQueryDto } from './dto/search-books.query';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 const API_PAGE_SIZE = 5;
 
@@ -55,9 +58,18 @@ export class BookController {
     });
   }
 
+  @UseInterceptors(FileInterceptor('bookFile'))
   @Post('/books')
-  async createBook(@Body() body: CreateBookDto, @Res() res: Response) {
-    await this.bookService.addBook(body);
+  async createBook(
+    @Body() body: CreateBookDto,
+    @UploadedFile() file: Express.Multer.File,
+    @Res() res: Response,
+  ) {
+    const error = await this.bookService.addBook({
+      ...body,
+      fileData: file.buffer,
+    });
+    if (error) return res.status(500).end();
     res.render('book-created', { title: body.title });
   }
 
@@ -85,6 +97,7 @@ export class BookController {
     res.render('partials/author-list', { authors });
   }
 
+  // TODO: update that
   @Post('/authors')
   addAuthorToList(@Body() body: unknown, @Res() res: Response) {
     const parsedBody = this.validateAndParse(body);

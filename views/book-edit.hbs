@@ -1,44 +1,108 @@
 <form
   id='book-creation-form'
-  class='flex flex-col border border-grey-300 rounded-md p-2 outline-none w-100 mx-auto mt-2'
-  hx-ext="json-enc"
+  class='flex flex-col border border-gray-300 rounded-lg p-6 w-full max-w-md mx-auto mt-8 space-y-4 shadow-md bg-white'
+  {{! hx-ext="json-enc" }}
   hx-post="/books"
-  hx-params="title, description, yearCreated, authorIds, countryCode"
+  hx-params="title, description, yearCreated, authorIds, countryCode, bookFile"
   hx-vals="js:{ authorIds: getAuthorIds() }"
+  enctype="multipart/form-data"
 >
-  <input
-    type='text'
-    name='title'
-    placeholder='Title'
-    class='border border-grey-100 rounded-md py-1 px-2 outline-none'
-  />
-
-  <textarea
-    name='description'
-    placeholder='Description'
-    class='border border-grey-100 rounded-md py-1 px-2 mt-2 outline-none'
-  ></textarea>
+  <h2 class='text-2xl font-bold text-gray-800 mb-4'>Create New Book</h2>
   
-  <input
-    name="yearCreated"
-    type="number"
-    placeholder="Year"
-    class='border border-grey-100 rounded-md py-1 px-2 outline-none mt-2'
-  />
+  <div class='space-y-2'>
+    <label class='block text-sm font-medium text-gray-700'>Title</label>
+    <input
+      type='text'
+      name='title'
+      placeholder='Book Title'
+      required
+      class='w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+    />
+  </div>
+
+  <div class='space-y-2'>
+    <label class='block text-sm font-medium text-gray-700'>Description</label>
+    <textarea
+      name='description'
+      placeholder='Book description...'
+      rows='4'
+      class='w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+    ></textarea>
+  </div>
+  
+  <div class='grid grid-cols-2 gap-4'>
+    <div class='space-y-2'>
+      <label class='block text-sm font-medium text-gray-700'>Year Created</label>
+      <input
+        name="yearCreated"
+        type="number"
+        placeholder="2023"
+        min="0"
+        max="2100"
+        class='w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+      />
+    </div>
+
+    <div class='space-y-2'>
+      <label class='block text-sm font-medium text-gray-700'>Country Code</label>
+      <input
+        name="countryCode"
+        maxlength="4"
+        placeholder="US"
+        pattern="[A-Za-z]{2,4}"
+        title="2-4 letter country code"
+        class='w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+      />
+    </div>
+  </div>
+
+  <div class='space-y-2'>
+    <label class='block text-sm font-medium text-gray-700'>Book File</label>
+    <div 
+      class='selectable mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md transition-colors duration-200 data-selected:border-blue-500 data-selected:bg-blue-50'
+    >
+      <div class='space-y-1 text-center'>
+        <svg 
+          class='selectable mx-auto h-12 w-12 text-gray-400 transition-colors duration-200 data-selected:text-blue-500'
+          stroke='currentColor'
+          fill='none'
+          viewBox='0 0 48 48'
+          aria-hidden='true'
+        >
+          <path d='M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' />
+        </svg>
+        <div class='flex text-sm text-gray-600'>
+          <label for='bookFile' class='relative cursor-pointer rounded-md font-medium transition-colors duration-200 text-blue-600 hover:text-blue-500 focus-within:outline-none'>
+            <span class="selectable data-selected:text-blue-700">Upload a file</span>
+            <input 
+              id='bookFile' 
+              name='bookFile' 
+              onchange="handleFileSelectorChanged()"
+              type='file' 
+              accept='.pdf,.epub,.mobi,.txt' 
+              hx-on:change="handleFileSelectorChanged()"
+              class='sr-only' 
+              required
+            />
+          </label>
+          <p class='pl-1'>or drag and drop</p>
+        </div>
+        <p 
+          id='file-name'
+          class='selectable text-xs font-medium text-gray-500 transition-colors duration-200 data-selected:text-blue-600'
+        >PDF, EPUB, MOBI, or TXT up to 10MB</p>
+      </div>
+    </div>
+  </div>
 
   {{> author_selector}}
 
-  <input
-    name="countryCode"
-    max="4"
-    placeholder="RU"
-    class='border border-grey-100 rounded-md py-1 px-2 outline-none mt-2'
-  />
-
   <button
     type='submit'
-    class='rounded-md bg-blue-500 hover:bg-blue-800 text-white w-24 shadow-lg transition cursor-pointer mt-2'
-  >Submit</button>
+    class='cursor-pointer w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 mt-4'
+  >
+    Create Book
+  </button>
 </form>
 
 <script>
@@ -51,5 +115,9 @@
 
   function removeAuthor(id) { 
     document.querySelector(`.selected-author-item[key='${id}']`)?.remove();
+  }
+
+  function handleFileSelectorChanged() {
+    document.querySelectorAll('.selectable').forEach(x => x.setAttribute('data-selected', true))
   }
 </script>

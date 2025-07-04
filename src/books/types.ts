@@ -16,6 +16,7 @@ export type BookCreateDTO = {
   authorIds: number[];
   yearCreated: number;
   isbn?: string;
+  fileData: Buffer;
 };
 
 export type Author = {
@@ -31,9 +32,10 @@ export type DbBook = {
   yearCreated: number;
   isbn?: string;
   listedAt: Date;
+  filePath: string;
 };
 
-export type BookRepr = Omit<DbBook, 'countryCode'> & {
+export type BookRepr = Omit<DbBook, 'countryCode' | 'filePath'> & {
   country: string;
   authors: { id: number; name: string }[];
 };

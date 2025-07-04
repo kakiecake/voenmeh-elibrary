@@ -1,28 +1,18 @@
-import { Transform } from 'class-transformer';
-import {
-  IsArray,
-  IsString,
-  IsNumber,
-  IsPositive,
-  MaxLength,
-} from 'class-validator';
+import { createZodDto } from 'nestjs-zod';
+import { z } from 'zod';
 
-export class CreateBookDto {
-  @IsString()
-  title: string;
+const CreateBookDtoSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  authorIds: z.union([
+    z.array(z.coerce.number()),
+    z.coerce
+      .number()
+      .optional()
+      .transform((x) => (x ? [x] : [])),
+  ]),
+  yearCreated: z.coerce.number().positive(),
+  countryCode: z.string().length(2),
+});
 
-  @IsString()
-  description: string;
-
-  @IsNumber({}, { each: true })
-  @IsArray()
-  authorIds: number[];
-
-  @IsPositive()
-  @Transform(({ value }) => parseInt(value as string))
-  yearCreated: number;
-
-  @MaxLength(4)
-  @IsString()
-  countryCode: string;
-}
+export class CreateBookDto extends createZodDto(CreateBookDtoSchema) {}
