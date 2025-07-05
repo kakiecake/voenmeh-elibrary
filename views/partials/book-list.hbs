@@ -6,12 +6,16 @@
 {{/unless}}
 
 {{#each books}}
-  <a href="/books/{{ id }}" class="py-2 px-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all flex flex-row justify-between" >
+  <a href="/books/{{ this.id }}" class="py-2 px-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all flex flex-row justify-between" >
     <div class="flex flex-col">
-      <h2 class="text-gray-900 font-semibold mb-1">{{title}}</h1>
-      <h3 class="text-xs">{{ authors.[0].name }}</h3>
+      <h2 class="text-gray-900 font-semibold mb-1">{{ this.title }}</h1>
+      <div class="flex flex-row gap-1">
+      {{#each authors}}
+      <h3 class="text-xs">{{ this.name }}</h3>
+      {{/each}}
+      </div>
     </div>
-    <div class="text-sm text-gray-500">{{ yearCreated }}</div>
+    <div class="text-sm text-gray-500">{{ this.yearCreated }}</div>
   </a>
 {{/each}}
 

@@ -8,7 +8,6 @@ import {
   Query,
   Redirect,
   Res,
-  UnprocessableEntityException,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -20,6 +19,8 @@ import { AuthorizedUser, UserDecorator } from '../users/user.decorator';
 import { SearchBooksQueryDto } from './dto/search-books.query';
 import { FileInterceptor } from '@nestjs/platform-express';
 import stream from 'node:stream';
+import { Protected } from '../users/auth.decorator';
+import { AddAuthorToListDto } from './dto/add-author-to-list.dto';
 
 const API_PAGE_SIZE = 5;
 
@@ -36,7 +37,7 @@ export class BookController {
 
   @Get('/books')
   async searchBooks(
-    @UserDecorator() user: AuthorizedUser | undefined,
+    @UserDecorator() user: AuthorizedUser | null,
     @Query() query: SearchBooksQueryDto,
     @Res() res: Response,
   ) {
@@ -59,19 +60,21 @@ export class BookController {
     });
   }
 
+  @Protected
   @UseInterceptors(FileInterceptor('bookFile'))
   @Post('/books')
   async createBook(
     @Body() body: CreateBookDto,
+    @UserDecorator() user: AuthorizedUser,
     @UploadedFile() file: Express.Multer.File,
     @Res() res: Response,
   ) {
-    const error = await this.bookService.addBook({
+    const result = await this.bookService.addBook({
       ...body,
       fileData: file.buffer,
     });
-    if (error) return res.status(500).end();
-    res.render('book-created', { title: body.title });
+    if (result instanceof Error) return res.status(500).end();
+    res.render('book-created', { ...result, user });
   }
 
   @Get('/admin')
@@ -98,16 +101,11 @@ export class BookController {
     res.render('partials/author-list', { authors });
   }
 
-  // TODO: update that
   @Post('/authors')
-  addAuthorToList(@Body() body: unknown, @Res() res: Response) {
-    const parsedBody = this.validateAndParse(body);
-    if (!parsedBody)
-      throw new UnprocessableEntityException('Invalid body format');
-
+  addAuthorToList(@Body() body: AddAuthorToListDto, @Res() res: Response) {
     const authors = [
-      ...parsedBody.authors.filter((a) => a.id !== parsedBody.newAuthor.id),
-      parsedBody.newAuthor,
+      ...body.authors.filter((a) => a.id !== body.newAuthor.id),
+      body.newAuthor,
     ];
 
     res.render('partials/author-selector', {
@@ -116,84 +114,15 @@ export class BookController {
     });
   }
 
-  private validateAndParse(input: unknown): {
-    authors: { id: string; name: string }[];
-    newAuthor: { id: string; name: string };
-  } | null {
-    if (
-      !input ||
-      typeof input !== 'object' ||
-      !('newAuthor' in input) ||
-      !input.newAuthor ||
-      typeof (input.newAuthor as { id?: unknown }).id !== 'string' ||
-      typeof (input.newAuthor as { name?: unknown }).name !== 'string'
-    ) {
-      return null;
-    }
-
-    const typedInput = input as {
-      id?: unknown;
-      name?: unknown;
-      newAuthor: { id: string; name: string };
-    };
-
-    const idType = typeof typedInput.id;
-    const nameType = typeof typedInput.name;
-    const idIsArray = Array.isArray(typedInput.id);
-    const nameIsArray = Array.isArray(typedInput.name);
-
-    if (
-      (idType !== 'undefined' || nameType !== 'undefined') &&
-      idType !== nameType
-    ) {
-      return null;
-    }
-
-    if (
-      idIsArray &&
-      nameIsArray &&
-      (typedInput.id as unknown[]).length !==
-        (typedInput.name as unknown[]).length
-    ) {
-      return null;
-    }
-
-    const authors: { id: string; name: string }[] = [];
-
-    if (idType === 'string') {
-      authors.push({
-        id: typedInput.id as string,
-        name: typedInput.name as string,
-      });
-    } else if (idIsArray) {
-      for (let i = 0; i < (typedInput.id as unknown[]).length; i += 1) {
-        if (
-          typeof (typedInput.id as unknown[])[i] !== 'string' ||
-          typeof (typedInput.name as unknown[])[i] !== 'string'
-        ) {
-          return null;
-        }
-        authors.push({
-          id: (typedInput.id as string[])[i],
-          name: (typedInput.name as string[])[i],
-        });
-      }
-    }
-
-    return {
-      authors,
-      newAuthor: typedInput.newAuthor,
-    };
-  }
-
   @Get('/books/:id')
   async getBookById(
     @Param('id', new ParseIntPipe()) id: number,
+    @UserDecorator() user: AuthorizedUser | null,
     @Res() res: Response,
   ) {
     const book = await this.bookService.getBookById(id);
     if (!book) return res.render('404', { message: 'Book not found' });
-    res.render('book-view', book);
+    res.render('book-view', { book, user });
   }
 
   @Get('/books/:id/download')

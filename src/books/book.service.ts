@@ -34,11 +34,16 @@ export class BookService {
   }
 
   // TODO: handle errors
-  async addBook(book: BookCreateDTO): Promise<void | Error> {
+  async addBook(
+    book: BookCreateDTO,
+  ): Promise<Pick<Book, 'id' | 'listedAt'> | Error> {
     const fileName = crypto.randomBytes(24).toString('base64url');
     // WARN: if book creation fails, created files will not be deleted
     const error = await this.fileStorage.writeFile(fileName, book.fileData);
     if (error) return new Error('File cannot be saved');
-    await this.bookRepository.createBook({ ...book, filePath: fileName });
+    return await this.bookRepository.createBook({
+      ...book,
+      filePath: fileName,
+    });
   }
 }

@@ -6,5 +6,5 @@ export type AuthorizedUser = Pick<User, 'id' | 'email' | 'role'>;
 
 export const UserDecorator = createParamDecorator((_, ctx) => {
   const req = ctx.switchToHttp().getRequest<Request>();
-  return req['user'] as AuthorizedUser;
+  return (req['user'] ?? null) as AuthorizedUser | null;
 });

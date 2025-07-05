@@ -1,6 +1,18 @@
-<div class='bg-gray-200 border border-grey-300 rounded-md px-4 py-2'>
-  <span>
-    Книга "{{title}}" успешно добавлена!
-  </span>
-  <a href="/admin">Добавить новую</a>
+<div class="bg-white border border-green-200 rounded-xl p-6 shadow-md max-w-xl mx-auto mt-10">
+  <div class="flex items-start space-x-4">
+    <div class="text-green-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+      </svg>
+    </div>
+    <div>
+      <h2 class="text-lg font-semibold text-gray-800 mb-1">Книга успешно добавлена</h2>
+      <p class="text-gray-600 mb-3">Книга <span class="font-medium text-gray-900">"{{title}}"</span> была успешно добавлена в коллекцию.</p>
+      <div class="flex flex-wrap gap-3">
+        <a href="/books/{{id}}" class="text-blue-600 hover:underline text-sm">Посмотреть книгу</a>
+        <a href="/admin" class="text-blue-600 hover:underline text-sm">Добавить новую</a>
+        <a href="/books" class="text-blue-600 hover:underline text-sm">Все книги</a>
+      </div>
+    </div>
+  </div>
 </div>
