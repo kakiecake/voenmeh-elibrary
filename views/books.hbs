@@ -2,11 +2,18 @@
 
 <div class="container mx-auto px-4 py-8 max-w-4xl">
   <div class="mb-8">
-    <form action="/books" method="GET" class="flex gap-2">
+    <form
+      method="GET"
+      class="flex gap-2"
+    >
       <input 
         type="text" 
         class="flex-grow px-4 py-2 border border-gray-300 hover:border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         name='q'
+        hx-trigger="keyup changed delay:500ms"
+        hx-get="/books"
+        hx-vals='{"partial": true}'
+        hx-target="#book-list"
         class='border rounded-md p-1 mr-1'
         placeholder='Название, ISBN или описание'
         {{#if query}}
