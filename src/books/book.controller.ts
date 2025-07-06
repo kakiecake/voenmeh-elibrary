@@ -74,12 +74,16 @@ export class BookController {
       fileData: file.buffer,
     });
     if (result instanceof Error) return res.status(500).end();
-    res.render('book-created', { ...result, user });
+    res.render('book-created', {
+      book: { ...body, ...result },
+      user,
+    });
   }
 
   @Get('/admin')
-  editBooks(@Res() res: Response) {
-    res.render('book-edit', { selectedIds: [] });
+  async editBooks(@Res() res: Response) {
+    const countries = await this.bookService.getCountries();
+    res.render('book-edit', { selectedIds: [], countries });
   }
 
   @Get('/authors/search')

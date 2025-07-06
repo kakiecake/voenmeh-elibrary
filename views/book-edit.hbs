@@ -16,7 +16,7 @@
       name='title'
       placeholder='Book Title'
       required
-      class='w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+      class='h-11 w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
     />
   </div>
 
@@ -39,20 +39,27 @@
         placeholder="2023"
         min="0"
         max="2100"
-        class='w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+        required
+        class='w-full h-10 border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
       />
     </div>
 
     <div class='space-y-2'>
-      <label class='block text-sm font-medium text-gray-700'>Country Code</label>
-      <input
-        name="countryCode"
-        maxlength="4"
-        placeholder="US"
-        pattern="[A-Za-z]{2,4}"
-        title="2-4 letter country code"
-        class='w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
-      />
+          <label class='block text-sm font-medium text-gray-700'>Country</label>
+          <select
+            name="countryCode"
+            class='w-full h-10 border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white'
+            placeholder="Выберите страну"
+            hx-validate="true"
+            hx-on:change="this.setCustomValidity('')"
+            hx-on:htmx:validation:validate="this.setCustomValidity(this.value === '' ? 'Необходимо выбрать другую страну' : '')"
+          >
+            <option value="">Select Country</option>
+            {{#each countries}}
+              <option value="{{ this.code }}">{{ name }}</option>
+            {{/each}}
+          </select>
+        </div>
     </div>
   </div>
 
@@ -63,7 +70,7 @@
     >
       <div class='space-y-1 text-center'>
         <svg 
-          class='selectable mx-auto h-12 w-12 text-gray-400 transition-colors duration-200 data-selected:text-blue-500'
+          class='selectable mx-auto h-11 w-12 text-gray-400 transition-colors duration-200 data-selected:text-blue-500'
           stroke='currentColor'
           fill='none'
           viewBox='0 0 48 48'
@@ -77,20 +84,20 @@
             <input 
               id='bookFile' 
               name='bookFile' 
-              onchange="handleFileSelectorChanged()"
               type='file' 
               accept='.pdf,.epub,.mobi,.txt' 
-              hx-on:change="handleFileSelectorChanged()"
+              hx-on:change="handleFileSelectorChanged(event)"
               class='sr-only' 
               required
             />
           </label>
-          <p class='pl-1'>or drag and drop</p>
+          <p class='pl-1 selectable'>or drag and drop</p>
         </div>
         <p 
           id='file-name'
           class='selectable text-xs font-medium text-gray-500 transition-colors duration-200 data-selected:text-blue-600'
         >PDF, EPUB, MOBI, or TXT up to 10MB</p>
+        <div id='selected-file' class='hidden selectable text-sm font-medium text-blue-600'></div>
       </div>
     </div>
   </div>
@@ -117,7 +124,22 @@
     document.querySelector(`.selected-author-item[key='${id}']`)?.remove();
   }
 
-  function handleFileSelectorChanged() {
-    document.querySelectorAll('.selectable').forEach(x => x.setAttribute('data-selected', true))
+  function handleFileSelectorChanged(e) {
+    const fileInput = e.target;
+    const file = fileInput.files[0];
+    const fileNameElement = document.getElementById('file-name');
+    const selectedFileElement = document.getElementById('selected-file');
+    
+    if (file) {
+      document.querySelectorAll('.selectable').forEach(x => x.setAttribute('data-selected', true));
+      
+      fileNameElement.classList.add('hidden');
+      selectedFileElement.textContent = `Selected: ${file.name}`;
+      selectedFileElement.classList.remove('hidden');
+    } else {
+      document.querySelectorAll('.selectable').forEach(x => x.removeAttribute('data-selected'));
+      fileNameElement.classList.remove('hidden');
+      selectedFileElement.classList.add('hidden');
+    }
   }
 </script>

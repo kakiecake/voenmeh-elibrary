@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { DbSymbol } from '../global.constants';
-import { BookRepr, DbBook } from './types';
+import { BookRepr, Country, DbBook } from './types';
 
 @Injectable()
 export class BookRepository {
@@ -83,5 +83,9 @@ export class BookRepository {
         ...book.authorIds,
       },
     );
+  }
+
+  getCountries(): Promise<Country[]> {
+    return this.db('countries').select('code', 'name');
   }
 }

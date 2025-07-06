@@ -39,3 +39,5 @@ export type BookRepr = Omit<DbBook, 'countryCode' | 'filePath'> & {
   country: string;
   authors: { id: number; name: string }[];
 };
+
+export type Country = { code: string; name: string };

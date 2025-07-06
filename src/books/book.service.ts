@@ -46,4 +46,8 @@ export class BookService {
       filePath: fileName,
     });
   }
+
+  getCountries() {
+    return this.bookRepository.getCountries();
+  }
 }
