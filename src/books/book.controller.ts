@@ -21,8 +21,12 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import stream from 'node:stream';
 import { Protected } from '../users/auth.decorator';
 import { AddAuthorToListDto } from './dto/add-author-to-list.dto';
+import { CreateAuthorDto } from './dto/create-author.dto';
+import { GetAuthorCreationFormQuery } from './dto/get-author-creation-form.query';
+import { SearchAuthorsQuery } from './dto/search-authors.query';
 
 const API_PAGE_SIZE = 5;
+const API_AUTHOR_LIMIT = 5;
 
 @Controller('/')
 export class BookController {
@@ -80,6 +84,7 @@ export class BookController {
     });
   }
 
+  @Protected
   @Get('/admin')
   async editBooks(@Res() res: Response) {
     const countries = await this.bookService.getCountries();
@@ -87,25 +92,16 @@ export class BookController {
   }
 
   @Get('/authors/search')
-  async findAuthors(
-    @Query('q') query: string | undefined,
-    @Query('excludeIds') excludeIdsRaw: string | string[] | undefined,
-    @Res() res: Response,
-  ) {
-    const excludeIds = excludeIdsRaw
-      ? (Array.isArray(excludeIdsRaw)
-          ? excludeIdsRaw.map((x) => parseInt(x))
-          : [parseInt(excludeIdsRaw)]
-        ).filter((x) => !Number.isNaN(x))
-      : [];
+  async findAuthors(@Query() query: SearchAuthorsQuery, @Res() res: Response) {
     const authors = await this.authorService.findAuthors(
-      query ?? '',
-      excludeIds,
+      query.q ?? '',
+      query.excludeIds,
+      API_AUTHOR_LIMIT,
     );
-    res.render('partials/author-list', { authors });
+    res.render('partials/author-list', { query: query.q, authors });
   }
 
-  @Post('/authors')
+  @Post('/authors/list')
   addAuthorToList(@Body() body: AddAuthorToListDto, @Res() res: Response) {
     const authors = [
       ...body.authors.filter((a) => a.id !== body.newAuthor.id),
@@ -115,6 +111,36 @@ export class BookController {
     res.render('partials/author-selector', {
       selectedIds: authors.map((a) => a.id),
       selectedAuthors: authors,
+    });
+  }
+
+  @Protected
+  @Post('/authors')
+  async createNewAuthor(@Body() body: CreateAuthorDto, @Res() res: Response) {
+    const author = await this.authorService.createAuthor(
+      body.name,
+      body.description,
+    );
+    if (!author)
+      return res.render('partials/author-creation-form', {
+        error: 'Автор с таким именем уже существует',
+        ...body,
+      });
+
+    res.render('partials/author-selector', {
+      selectedAuthors: [...body.selectedAuthors, author],
+    });
+  }
+
+  @Protected
+  @Get('/authors/creation-form')
+  getAuthorCreationForm(
+    @Query() query: GetAuthorCreationFormQuery,
+    @Res() res: Response,
+  ) {
+    res.render('partials/author-creation-form', {
+      name: query.query?.trim() ?? '',
+      selectedAuthors: query.selectedAuthors,
     });
   }
 

@@ -1,23 +1,12 @@
 import { createZodDto } from 'nestjs-zod';
+import { htmxArray } from '../../util';
 import { z } from 'zod';
 
 const AddAuthorToListDtoSchema = z
   .object({
     newAuthor: z.object({ id: z.coerce.number(), name: z.string() }),
-    id: z.union([
-      z.coerce
-        .number()
-        .optional()
-        .transform((x) => (x ? [x] : [])),
-      z.array(z.coerce.number()),
-    ]),
-    name: z.union([
-      z
-        .string()
-        .optional()
-        .transform((x) => (x ? [x] : [])),
-      z.array(z.string()),
-    ]),
+    id: htmxArray(z.coerce.number()),
+    name: htmxArray(z.string()),
   })
   .refine(({ id, name }) => id.length === name.length)
   .transform((obj) => ({

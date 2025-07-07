@@ -1,0 +1,40 @@
+<form 
+    class="border border-gray-300 p-2 rounded-md"
+    id='author-creation-form'
+    hx-post="/authors"
+    hx-swap="outerHTML"
+    hx-ext="json-enc"
+    hx-params="name, description, authorId, authorName"
+>
+    {{#each selectedAuthors}}
+    <input type="hidden" name="authorId" value="{{this.id}}">
+    <input type="hidden" name="authorName" value="{{this.name}}">
+    {{/each}}
+    <div class='space-y-2'>
+        <label class='block text-sm font-medium text-gray-700'>Имя автора</label>
+        <input
+            type='text'
+            name='name'
+            placeholder='Имя автора'
+            value='{{ name }}'
+            required
+            class='h-11 w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+        />
+    </div>
+
+    <div class='space-y-2 mt-2'>
+        <label class='block text-sm font-medium text-gray-700'>Описание</label>
+        <textarea
+        name='description'
+        placeholder='Описание автора'
+        rows='3'
+        value='{{ description }}'
+        class='w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+        ></textarea>
+    </div>
+
+    <div class="flex mt-2">
+        <button class="ml-auto cursor-pointer py-2 px-3 text-white border rounded-md border-gray-300 bg-red-600 hover:bg-red-700">Назад</button>
+        <button class="ml-1 cursor-pointer py-2 px-3 text-white border rounded-md border-gray-300 bg-blue-600 hover:bg-blue-700" type="submit">Добавить автора</button>
+    </div>
+</form>

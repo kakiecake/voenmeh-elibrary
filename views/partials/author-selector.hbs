@@ -1,23 +1,21 @@
-<div
-  id='author-selector-container'
+<div id='author-selector-container'
   class='flex flex-col group relative mt-2'
   name='author'
 >
   <div
     id='author-selector'
-    class='min-h-11 flex flex-row flex-wrap items-center border border-gray-300 rounded-md py-2 px-3 focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent'
+    class='min-h-11 flex flex-row gap-2 flex-wrap items-center border border-gray-300 rounded-md py-2 px-3 focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent'
   >
     {{#each selectedAuthors}}
       <span
         key='{{id}}'
-        class='selected-author-item rounded-lg border border-gray-300 px-2.5 py-1 mr-2'
+        class='selected-author-item rounded-lg border border-gray-300 px-2.5 py-1'
       >
         <input type='hidden' name='id' value='{{id}}' />
         <input type='hidden' name='name' value='{{name}}' />
         {{name}}
         <button
-          class='remove-author'
-          class='cursor-pointer'
+          class='remove-author cursor-pointer'
           hx-on:click="removeAuthor('{{id}}')"
         >×</button>
       </span>
@@ -28,9 +26,9 @@
       type='text'
       id='author-search'
       name='q'
-      placeholder='Search authors...'
+      placeholder='Поиск авторов'
       hx-get='/authors/search'
-      hx-trigger='keyup changed delay:200ms'
+      hx-trigger='keyup changed delay:200ms, focus delay:300ms'
       hx-target='#search-results'
       hx-vals='js:{"excludeIds": getAuthorIds() }'
       hx-params='q, excludeIds'

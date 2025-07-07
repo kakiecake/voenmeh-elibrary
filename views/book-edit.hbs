@@ -7,24 +7,24 @@
   hx-vals="js:{ authorIds: getAuthorIds() }"
   enctype="multipart/form-data"
 >
-  <h2 class='text-2xl font-bold text-gray-800 mb-4'>Create New Book</h2>
+  <h2 class='text-2xl font-bold text-gray-800 mb-4'>Добавить новую книгу</h2>
   
   <div class='space-y-2'>
-    <label class='block text-sm font-medium text-gray-700'>Title</label>
+    <label class='block text-sm font-medium text-gray-700'>Название</label>
     <input
       type='text'
       name='title'
-      placeholder='Book Title'
+      placeholder='Название книги'
       required
       class='h-11 w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
     />
   </div>
 
   <div class='space-y-2'>
-    <label class='block text-sm font-medium text-gray-700'>Description</label>
+    <label class='block text-sm font-medium text-gray-700'>Описание</label>
     <textarea
       name='description'
-      placeholder='Book description...'
+      placeholder='Описание книги'
       rows='4'
       class='w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
     ></textarea>
@@ -32,7 +32,7 @@
   
   <div class='grid grid-cols-2 gap-4'>
     <div class='space-y-2'>
-      <label class='block text-sm font-medium text-gray-700'>Year Created</label>
+      <label class='block text-sm font-medium text-gray-700'>Год издания</label>
       <input
         name="yearCreated"
         type="number"
@@ -45,7 +45,7 @@
     </div>
 
     <div class='space-y-2'>
-          <label class='block text-sm font-medium text-gray-700'>Country</label>
+          <label class='block text-sm font-medium text-gray-700'>Страна</label>
           <select
             name="countryCode"
             class='w-full h-10 border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white'
@@ -54,7 +54,7 @@
             hx-on:change="this.setCustomValidity('')"
             hx-on:htmx:validation:validate="this.setCustomValidity(this.value === '' ? 'Необходимо выбрать другую страну' : '')"
           >
-            <option value="">Select Country</option>
+            <option value="">Выберите страну</option>
             {{#each countries}}
               <option value="{{ this.code }}">{{ name }}</option>
             {{/each}}
@@ -64,7 +64,7 @@
   </div>
 
   <div class='space-y-2'>
-    <label class='block text-sm font-medium text-gray-700'>Book File</label>
+    <label class='block text-sm font-medium text-gray-700'>Файл книги</label>
     <div 
       class='selectable mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md transition-colors duration-200 data-selected:border-blue-500 data-selected:bg-blue-50'
     >
@@ -80,7 +80,7 @@
         </svg>
         <div class='flex text-sm text-gray-600'>
           <label for='bookFile' class='relative cursor-pointer rounded-md font-medium transition-colors duration-200 text-blue-600 hover:text-blue-500 focus-within:outline-none'>
-            <span class="selectable data-selected:text-blue-700">Upload a file</span>
+            <span class="selectable data-selected:text-blue-700">Загрузите файл</span>
             <input 
               id='bookFile' 
               name='bookFile' 
@@ -91,12 +91,12 @@
               required
             />
           </label>
-          <p class='pl-1 selectable'>or drag and drop</p>
+          <p class='pl-1 selectable'>или перетащите его сюда</p>
         </div>
         <p 
           id='file-name'
           class='selectable text-xs font-medium text-gray-500 transition-colors duration-200 data-selected:text-blue-600'
-        >PDF, EPUB, MOBI, or TXT up to 10MB</p>
+        >PDF, EPUB, MOBI, или TXT до 10МБ</p>
         <div id='selected-file' class='hidden selectable text-sm font-medium text-blue-600'></div>
       </div>
     </div>
@@ -108,7 +108,7 @@
     type='submit'
     class='cursor-pointer w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 mt-4'
   >
-    Create Book
+    Добавить книгу
   </button>
 </form>
 
@@ -134,7 +134,7 @@
       document.querySelectorAll('.selectable').forEach(x => x.setAttribute('data-selected', true));
       
       fileNameElement.classList.add('hidden');
-      selectedFileElement.textContent = `Selected: ${file.name}`;
+      selectedFileElement.textContent = file.name;
       selectedFileElement.classList.remove('hidden');
     } else {
       document.querySelectorAll('.selectable').forEach(x => x.removeAttribute('data-selected'));
