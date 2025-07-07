@@ -48,10 +48,18 @@ export class BookRepository {
     offset: number,
     limit: number,
   ): Promise<BookRepr[]> {
-    return await this.selectBooks<BookRepr[]>()
-      .whereRaw("search_vec @@ websearch_to_tsquery('russian', ?)", query)
+    let qb = this.selectBooks<BookRepr[]>()
       .limit(limit)
-      .offset(offset);
+      .offset(offset)
+      .orderBy('listed_at', 'desc');
+
+    if (query)
+      qb = qb.whereRaw(
+        "search_vec @@ websearch_to_tsquery('russian', ?)",
+        query,
+      );
+
+    return await qb;
   }
 
   async createBook(

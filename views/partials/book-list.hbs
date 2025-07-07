@@ -1,9 +1,9 @@
-{{#unless books.length}}
+{{#and (eq books.length 0) (eq pagination.page 0)}}
   <div class="text-center text-gray-500 py-8">
     <h2 class="text-lg font-semibold mb-2">Ничего не найдено</h2>
     <p class="text-sm">Попробуйте изменить поисковый запрос или проверьте написание.</p>
   </div>
-{{/unless}}
+{{/and}}
 
 {{#each books}}
   <a href="/books/{{ this.id }}" class="py-2 px-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all flex flex-row justify-between" >

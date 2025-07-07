@@ -91,6 +91,7 @@ export class BookController {
     res.render('book-edit', { selectedIds: [], countries });
   }
 
+  @Protected
   @Get('/authors/search')
   async findAuthors(@Query() query: SearchAuthorsQuery, @Res() res: Response) {
     const authors = await this.authorService.findAuthors(
@@ -101,6 +102,7 @@ export class BookController {
     res.render('partials/author-list', { query: query.q, authors });
   }
 
+  @Protected
   @Post('/authors/list')
   addAuthorToList(@Body() body: AddAuthorToListDto, @Res() res: Response) {
     const authors = [
