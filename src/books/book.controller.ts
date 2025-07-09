@@ -8,7 +8,9 @@ import {
   Query,
   Redirect,
   Res,
+  UnauthorizedException,
   UploadedFile,
+  UseFilters,
   UseInterceptors,
 } from '@nestjs/common';
 import { BookService } from './book.service';
@@ -28,6 +30,7 @@ import { GetBookmarksQuery } from './dto/get-bookmarks.query';
 import { GetAuthorQuery } from './dto/get-author.query';
 import { Author } from './types';
 import { PaginationQuery } from './dto/pagination.query';
+import { AuthExceptionFilter } from 'src/auth.exception-filter';
 
 // const API_PAGE_SIZE = 5;
 const API_PAGE_SIZE = 10;

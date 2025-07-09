@@ -1,3 +1,7 @@
-import { SetMetadata } from '@nestjs/common';
+import { applyDecorators, SetMetadata, UseFilters } from '@nestjs/common';
+import { AuthExceptionFilter } from 'src/auth.exception-filter';
 
-export const Protected = SetMetadata('protected', true);
+export const Protected = applyDecorators(
+  SetMetadata('protected', true),
+  UseFilters(AuthExceptionFilter),
+);
