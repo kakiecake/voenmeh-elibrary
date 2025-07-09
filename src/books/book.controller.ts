@@ -24,8 +24,10 @@ import { AddAuthorToListDto } from './dto/add-author-to-list.dto';
 import { CreateAuthorDto } from './dto/create-author.dto';
 import { GetAuthorCreationFormQuery } from './dto/get-author-creation-form.query';
 import { SearchAuthorsQuery } from './dto/search-authors.query';
+import { GetBookmarksQuery } from './dto/get-bookmarks.query';
 
-const API_PAGE_SIZE = 5;
+// const API_PAGE_SIZE = 5;
+const API_PAGE_SIZE = 10;
 const API_AUTHOR_LIMIT = 5;
 
 @Controller('/')
@@ -45,10 +47,14 @@ export class BookController {
     @Query() query: SearchBooksQueryDto,
     @Res() res: Response,
   ) {
-    const books = await this.bookService.findBooks(query.q ?? '', {
-      pageIndex: query.page - 1,
-      pageSize: API_PAGE_SIZE,
-    });
+    const books = await this.bookService.searchBooksForUser(
+      query.q ?? '',
+      user?.id ?? null,
+      {
+        pageIndex: query.page - 1,
+        pageSize: API_PAGE_SIZE,
+      },
+    );
 
     const isEnd = books.length < API_PAGE_SIZE;
     res.render(query.partial ? 'partials/book-list' : 'books', {
@@ -152,9 +158,47 @@ export class BookController {
     @UserDecorator() user: AuthorizedUser | null,
     @Res() res: Response,
   ) {
-    const book = await this.bookService.getBookById(id);
+    const book = await this.bookService.getBookForUser(id, user?.id ?? null);
     if (!book) return res.render('404', { message: 'Book not found' });
     res.render('book-view', { book, user });
+  }
+
+  @Protected
+  @Post('/books/:id/bookmark')
+  async toggleBookmark(
+    @Param('id', new ParseIntPipe()) bookId: number,
+    @UserDecorator() user: AuthorizedUser,
+    @Res() res: Response,
+  ) {
+    const isBookmarked = await this.bookService.toggleBookmark(user.id, bookId);
+    res.render('partials/book-list-bookmark-button', {
+      id: bookId,
+      isBookmarked,
+    });
+  }
+
+  @Protected
+  @Get('/bookmarks')
+  async renderBookmarksPage(
+    @Query() query: GetBookmarksQuery,
+    @UserDecorator() user: AuthorizedUser,
+    @Res() res: Response,
+  ) {
+    const books = await this.bookService.getBooksWithBookmarks(user.id, {
+      pageIndex: query.page - 1,
+      pageSize: API_PAGE_SIZE,
+    });
+    const isEnd = books.length < API_PAGE_SIZE;
+    res.render(query.partial ? 'partials/bookmark-list' : 'bookmarks', {
+      user,
+      books,
+      partial: query.partial,
+      pagination: {
+        page: query.page,
+        isEnd,
+        nextPage: isEnd ? null : query.page + 1,
+      },
+    });
   }
 
   @Get('/books/:id/download')

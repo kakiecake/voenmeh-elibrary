@@ -29,12 +29,13 @@ export class UserRepository {
     const [user] = await this.db('users')
       .insert({
         email,
-        password_hash: this.db.raw("crypt(?, gen_salt('bf', 8)", password),
+        password_hash: this.db.raw("crypt(?, gen_salt('bf', 8))", password),
         role,
       })
-      .returning<[Pick<User, 'id' | 'createdAt'>]>(
-        'id, created_at AS "createdAt"',
-      );
+      .returning<[Pick<User, 'id' | 'createdAt'>]>([
+        'id',
+        'created_at AS "createdAt"',
+      ]);
     return user ?? null;
   }
 }

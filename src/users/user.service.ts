@@ -20,13 +20,18 @@ export class UserService {
     return { accessToken };
   }
 
-  async register(email: string, password: string): Promise<User | null> {
+  async register(
+    email: string,
+    password: string,
+  ): Promise<{ accessToken: string } | null> {
     const createdUser = await this.userRepository.createUser(
       email,
       password,
       USER_ROLES.Reader,
     );
     if (!createdUser) return null;
-    return { ...createdUser, email, role: USER_ROLES.Reader };
+    const user = { ...createdUser, email, role: USER_ROLES.Reader };
+    const accessToken = await this.jwtService.signAsync(user);
+    return { accessToken };
   }
 }

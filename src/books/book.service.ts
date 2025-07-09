@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Book, BookCreateDTO } from './types';
+import { Book, BookCreateDTO, Country } from './types';
 import { BookRepository } from './book.repository';
 import { Readable } from 'node:stream';
 import crypto from 'node:crypto';
@@ -18,16 +18,32 @@ export class BookService {
     return this.fileStorage.readFile(filePath);
   }
 
-  async getBookById(id: number): Promise<Book | null> {
-    return await this.bookRepository.getBookById(id);
+  async getBookForUser(
+    id: number,
+    userId: number | null,
+  ): Promise<Book | null> {
+    return await this.bookRepository.getBookForUser(id, userId);
   }
 
-  async findBooks(
+  async getBooksWithBookmarks(
+    userId: number,
+    pagination: { pageIndex: number; pageSize: number },
+  ): Promise<Book[]> {
+    return await this.bookRepository.getBooksWithBookmarks(
+      userId,
+      pagination.pageSize * pagination.pageIndex,
+      pagination.pageSize,
+    );
+  }
+
+  async searchBooksForUser(
     query: string,
+    userId: number | null,
     pagination: { pageIndex: number; pageSize: number },
   ): Promise<Omit<Book, 'fileData'>[]> {
-    return await this.bookRepository.searchBooks(
+    return await this.bookRepository.searchBooksForUser(
       query,
+      userId,
       pagination.pageSize * pagination.pageIndex,
       pagination.pageSize,
     );
@@ -47,7 +63,11 @@ export class BookService {
     });
   }
 
-  getCountries() {
-    return this.bookRepository.getCountries();
+  async getCountries(): Promise<Country[]> {
+    return await this.bookRepository.getCountries();
+  }
+
+  async toggleBookmark(userId: number, bookId: number): Promise<boolean> {
+    return await this.bookRepository.toggleBookmark(userId, bookId);
   }
 }

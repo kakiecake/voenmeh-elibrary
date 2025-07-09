@@ -1,9 +1,9 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
+import { PaginationSchema } from './pagination.query';
 
-const SearchBooksQuerySchema = z.object({
+const SearchBooksQuerySchema = PaginationSchema.extend({
   q: z.string().optional(),
-  page: z.coerce.number().positive().optional().default(1),
   partial: z
     .string()
     .optional()

@@ -60,12 +60,20 @@ export class UserController {
 
   @Post('/register')
   async register(@Body() body: RegisterDto, @Res() res: Response) {
-    const user = await this.userService.register(body.email, body.password);
-    if (!user) {
+    const result = await this.userService.register(body.email, body.password);
+    if (!result) {
       return res.render('authForm', {
         authError: 'Пользователь с таким email адресом уже зарегистрирован',
       });
     }
-    res.status(200).header('HX-Redirect', '/');
+    res
+      .status(200)
+      .header('HX-Redirect', '/')
+      .cookie(AUTH_TOKEN_COOKIE_NAME, result.accessToken, {
+        sameSite: 'strict',
+        secure: true,
+        httpOnly: true,
+      })
+      .end();
   }
 }

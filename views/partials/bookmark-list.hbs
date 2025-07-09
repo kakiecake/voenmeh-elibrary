@@ -1,15 +1,12 @@
-{{#and (eq books.length 0) (eq pagination.page 0)}}
+{{#and (eq books.length 0) (eq pagination.page 1)}}
   <div class="text-center text-gray-500 py-8">
-    <h2 class="text-lg font-semibold mb-2">Ничего не найдено</h2>
-    <p class="text-sm">Попробуйте изменить поисковый запрос или проверьте написание.</p>
+    <h2 class="text-lg font-semibold mb-2">У вас нет закладок</h2>
+    <p class="text-sm">Потом здесь появятся книги, которые вы добавили в закладки</p>
   </div>
 {{/and}}
 
 {{#each books}}
-  <li 
-    key="{{ this.id }}"
-    class="py-2 px-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all flex flex-row justify-between items-center"
-  >
+  <li class="py-2 px-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all flex flex-row justify-between items-center" >
     <a href="/books/{{ this.id }}" class="flex flex-col w-full">
       <h2 class="text-gray-900 font-semibold mb-1">{{ this.title }}</h1>
       <div class="flex flex-row gap-1">
@@ -35,10 +32,10 @@
   <button 
     id="load-more-button"
     hx-swap-oob="true"
-    class="cursor-pointer" 
-    hx-get="/books"
-    hx-vals='{ "q": "{{ query }}", "page": {{ pagination.nextPage }}, "partial": true }'
-    hx-params="q, partial, page"
+    class="cursor-pointer w-full" 
+    hx-get="/bookmarks"
+    hx-vals='{ "page": {{ pagination.nextPage }}, "partial": true }'
+    hx-params="partial, page"
     hx-target="previous"
     hx-swap="afterend"
   >Еще</button>

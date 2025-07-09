@@ -7,6 +7,7 @@ export type Book = {
   yearCreated: number;
   isbn?: string;
   listedAt: Date;
+  isBookmarked: boolean;
 };
 
 export type BookCreateDTO = {
@@ -39,6 +40,7 @@ export type DbBook = {
 export type BookRepr = Omit<DbBook, 'countryCode' | 'filePath'> & {
   country: string;
   authors: { id: number; name: string }[];
+  isBookmarked: boolean;
 };
 
 export type Country = { code: string; name: string };
