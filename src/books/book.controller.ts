@@ -25,6 +25,9 @@ import { CreateAuthorDto } from './dto/create-author.dto';
 import { GetAuthorCreationFormQuery } from './dto/get-author-creation-form.query';
 import { SearchAuthorsQuery } from './dto/search-authors.query';
 import { GetBookmarksQuery } from './dto/get-bookmarks.query';
+import { GetAuthorQuery } from './dto/get-author.query';
+import { Author } from './types';
+import { PaginationQuery } from './dto/pagination.query';
 
 // const API_PAGE_SIZE = 5;
 const API_PAGE_SIZE = 10;
@@ -92,9 +95,9 @@ export class BookController {
 
   @Protected
   @Get('/admin')
-  async editBooks(@Res() res: Response) {
+  async editBooks(@UserDecorator() user: AuthorizedUser, @Res() res: Response) {
     const countries = await this.bookService.getCountries();
-    res.render('book-edit', { selectedIds: [], countries });
+    res.render('book-edit', { selectedIds: [], countries, user });
   }
 
   @Protected
@@ -198,6 +201,34 @@ export class BookController {
         isEnd,
         nextPage: isEnd ? null : query.page + 1,
       },
+    });
+  }
+
+  @Get('/authors/:id')
+  async renderAuthorPage(
+    @Param('id', new ParseIntPipe()) authorId: number,
+    @Query() query: GetAuthorQuery,
+    @UserDecorator() user: AuthorizedUser | null,
+    @Res() res: Response,
+  ) {
+    const authorWithBooks = await this.authorService.getAuthorWithBooks(
+      authorId,
+      {
+        pageIndex: query.page - 1,
+        pageSize: API_PAGE_SIZE,
+      },
+    );
+    const isEnd = authorWithBooks.books.length < API_PAGE_SIZE;
+    const pagination = {
+      page: query.page,
+      nextPage: isEnd ? null : query.page + 1,
+      isEnd,
+    };
+    res.render(query.partial ? 'partials/author-book-list' : 'author', {
+      ...authorWithBooks,
+      user,
+      pagination,
+      partial: query.partial,
     });
   }
 

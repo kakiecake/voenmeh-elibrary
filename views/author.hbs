@@ -1,0 +1,20 @@
+{{>navbar}}
+
+<div class="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md mt-2">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-2">{{ author.name }}</h1>
+    <p class="text-gray-600 mb-6">{{ author.description }}</p>
+  </div>
+
+  <div>
+    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Книги автора</h2>
+    
+    {{#if books.length}}
+      <div id="author-book-list" class="grid gap-6 md:grid-cols-2">
+        {{>author_book_list}}
+      </div>
+    {{else}}
+      <p class="text-gray-500">У этого автора пока нет книг в библиотеке.</p>
+    {{/if}}
+  </div>
+</div>

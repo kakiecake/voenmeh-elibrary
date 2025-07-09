@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { AuthorRepository } from './author.repository';
-import { Author } from './types';
+import { Author, Book } from './types';
 
 @Injectable()
 export class AuthorService {
@@ -20,5 +20,22 @@ export class AuthorService {
   ): Promise<Author | null> {
     const result = await this.authorRepository.createAuthor(name, description);
     return result ? { ...result, name, description } : null;
+  }
+
+  async getAuthorWithBooks(
+    authorId: number,
+    pagination: { pageIndex: number; pageSize: number },
+  ): Promise<{
+    author: Author;
+    books: Pick<Book, 'id' | 'title' | 'yearCreated'>[];
+  }> {
+    const offset = pagination.pageIndex * pagination.pageSize;
+    const limit = pagination.pageSize;
+
+    return await this.authorRepository.getAuthorWithBooks(
+      authorId,
+      offset,
+      limit,
+    );
   }
 }
