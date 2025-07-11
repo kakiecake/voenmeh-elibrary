@@ -1,16 +1,16 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
   Redirect,
   Res,
-  UnauthorizedException,
   UploadedFile,
-  UseFilters,
   UseInterceptors,
 } from '@nestjs/common';
 import { BookService } from './book.service';
@@ -28,11 +28,7 @@ import { GetAuthorCreationFormQuery } from './dto/get-author-creation-form.query
 import { SearchAuthorsQuery } from './dto/search-authors.query';
 import { GetBookmarksQuery } from './dto/get-bookmarks.query';
 import { GetAuthorQuery } from './dto/get-author.query';
-import { Author } from './types';
-import { PaginationQuery } from './dto/pagination.query';
-import { AuthExceptionFilter } from 'src/auth.exception-filter';
 
-// const API_PAGE_SIZE = 5;
 const API_PAGE_SIZE = 10;
 const API_AUTHOR_LIMIT = 5;
 
@@ -76,7 +72,7 @@ export class BookController {
     });
   }
 
-  @Protected
+  @Protected({ adminOnly: true })
   @UseInterceptors(FileInterceptor('bookFile'))
   @Post('/books')
   async createBook(
@@ -96,14 +92,72 @@ export class BookController {
     });
   }
 
-  @Protected
-  @Get('/admin')
-  async editBooks(@UserDecorator() user: AuthorizedUser, @Res() res: Response) {
+  @Protected({ adminOnly: true })
+  @UseInterceptors(FileInterceptor('bookFile'))
+  @Patch('/books/:id')
+  async updateBook(
+    @Param('id', new ParseIntPipe()) bookId: number,
+    @Body() body: CreateBookDto,
+    @UserDecorator() user: AuthorizedUser,
+    @UploadedFile() file: Express.Multer.File | undefined,
+    @Res() res: Response,
+  ) {
+    const result = await this.bookService.updateBook(bookId, {
+      ...body,
+      fileData: file?.buffer,
+    });
+    if (result instanceof Error) return res.status(500).end();
+    res.render('book-created', {
+      edited: true,
+      book: { id: bookId, ...body },
+      user,
+    });
+  }
+
+  @Protected({ adminOnly: true })
+  @Delete('/books/:id')
+  async deleteBook(
+    @Query('redirect') redirectQuery: string,
+    @Param('id', new ParseIntPipe()) bookId: number,
+    @Res() res: Response,
+  ) {
+    const shouldRedirect = !!redirectQuery;
+    await this.bookService.deleteBook(bookId);
+    res.status(200);
+    if (shouldRedirect) res.setHeader('HX-Redirect', '/books');
+    res.end();
+  }
+
+  @Protected({ adminOnly: true })
+  @Get('/books/new')
+  async renderNewBookPage(
+    @UserDecorator() user: AuthorizedUser,
+    @Res() res: Response,
+  ) {
     const countries = await this.bookService.getCountries();
     res.render('book-edit', { selectedIds: [], countries, user });
   }
 
-  @Protected
+  @Protected({ adminOnly: true })
+  @Get('/books/:id/edit')
+  async editBooks(
+    @Param('id', new ParseIntPipe()) bookId: number,
+    @UserDecorator() user: AuthorizedUser,
+    @Res() res: Response,
+  ) {
+    const book = await this.bookService.getBookForUser(bookId, user.id);
+    if (!book) return res.render('404');
+    const countries = await this.bookService.getCountries();
+    res.render('book-edit', {
+      selectedIds: [],
+      selectedAuthors: book.authors,
+      countries,
+      user,
+      book,
+    });
+  }
+
+  @Protected({ adminOnly: true })
   @Get('/authors/search')
   async findAuthors(@Query() query: SearchAuthorsQuery, @Res() res: Response) {
     const authors = await this.authorService.findAuthors(
@@ -114,7 +168,7 @@ export class BookController {
     res.render('partials/author-list', { query: query.q, authors });
   }
 
-  @Protected
+  @Protected({ adminOnly: true })
   @Post('/authors/list')
   addAuthorToList(@Body() body: AddAuthorToListDto, @Res() res: Response) {
     const authors = [
@@ -128,7 +182,7 @@ export class BookController {
     });
   }
 
-  @Protected
+  @Protected({ adminOnly: true })
   @Post('/authors')
   async createNewAuthor(@Body() body: CreateAuthorDto, @Res() res: Response) {
     const author = await this.authorService.createAuthor(
@@ -146,7 +200,7 @@ export class BookController {
     });
   }
 
-  @Protected
+  @Protected({ adminOnly: true })
   @Get('/authors/creation-form')
   getAuthorCreationForm(
     @Query() query: GetAuthorCreationFormQuery,
@@ -169,7 +223,7 @@ export class BookController {
     res.render('book-view', { book, user });
   }
 
-  @Protected
+  @Protected({ adminOnly: true })
   @Post('/books/:id/bookmark')
   async toggleBookmark(
     @Param('id', new ParseIntPipe()) bookId: number,
@@ -183,7 +237,7 @@ export class BookController {
     });
   }
 
-  @Protected
+  @Protected()
   @Get('/bookmarks')
   async renderBookmarksPage(
     @Query() query: GetBookmarksQuery,

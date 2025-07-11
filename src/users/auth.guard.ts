@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { User } from './types';
+import { User, USER_ROLES } from './types';
 import { AUTH_TOKEN_COOKIE_NAME } from './constants';
 import { Reflector } from '@nestjs/core';
 import { ConfigSymbol } from '../global.constants';
@@ -24,6 +24,10 @@ export class AuthGuard implements CanActivate {
       'protected',
       ctx.getHandler(),
     );
+    const isAdminOnly = this.reflector.get<boolean>(
+      'adminOnly',
+      ctx.getHandler(),
+    );
 
     const token = this.extractTokenFromRequest(req);
     if (!token) return !isProtected;
@@ -37,6 +41,8 @@ export class AuthGuard implements CanActivate {
     if (payload instanceof Error) {
       return !isProtected;
     }
+
+    if (isAdminOnly && payload.role < USER_ROLES.Admin) return false;
 
     req['user'] = payload;
 

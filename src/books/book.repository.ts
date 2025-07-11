@@ -134,6 +134,45 @@ export class BookRepository {
     return await qb;
   }
 
+  // TODO: prettify the SQL and potentyally omit the transaction
+  async updateBook(
+    book: Pick<DbBook, 'id'> &
+      Partial<Omit<DbBook, 'id' | 'listedAt'> & { authorIds: number[] }>,
+  ): Promise<void> {
+    await this.db.transaction(async (trx) => {
+      // Update book fields if any are provided
+      const bookUpdateData = {
+        title: book.title,
+        description: book.description,
+        year_created: book.yearCreated,
+        country_code: book.countryCode,
+        filePath: book.filePath,
+      };
+
+      const cleanBookUpdate = Object.fromEntries(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        Object.entries(bookUpdateData).filter(([_, v]) => v !== undefined),
+      );
+
+      if (Object.keys(cleanBookUpdate).length > 0) {
+        await trx('books').where({ id: book.id }).update(cleanBookUpdate);
+      }
+
+      if (book.authorIds) {
+        await trx('book_authors').where({ book_id: book.id }).delete();
+
+        if (book.authorIds.length > 0) {
+          await trx('book_authors').insert(
+            book.authorIds.map((authorId) => ({
+              book_id: book.id,
+              author_id: authorId,
+            })),
+          );
+        }
+      }
+    });
+  }
+
   async createBook(
     book: Omit<DbBook, 'id' | 'listedAt'> & { authorIds: number[] },
   ): Promise<Pick<DbBook, 'id' | 'listedAt'>> {
@@ -186,5 +225,9 @@ export class BookRepository {
       { userId, bookId },
     );
     return insertResult.rowCount > 0;
+  }
+
+  async deleteBook(id: number): Promise<void> {
+    await this.db('books').delete().where('id', '=', id);
   }
 }

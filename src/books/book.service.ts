@@ -25,6 +25,10 @@ export class BookService {
     return await this.bookRepository.getBookForUser(id, userId);
   }
 
+  async deleteBook(id: number): Promise<void> {
+    await this.bookRepository.deleteBook(id);
+  }
+
   async getBooksWithBookmarks(
     userId: number,
     pagination: { pageIndex: number; pageSize: number },
@@ -60,6 +64,24 @@ export class BookService {
     return await this.bookRepository.createBook({
       ...book,
       filePath: fileName,
+    });
+  }
+
+  async updateBook(
+    id: number,
+    book: Partial<BookCreateDTO>,
+  ): Promise<void | Error> {
+    let filePath: string | undefined;
+    if (book.fileData) {
+      filePath = crypto.randomBytes(24).toString('base64url');
+      // WARN: if book creation fails, created files will not be deleted
+      const error = await this.fileStorage.writeFile(filePath, book.fileData);
+      if (error) return new Error('File cannot be saved');
+    }
+    await this.bookRepository.updateBook({
+      id,
+      ...book,
+      filePath,
     });
   }
 
