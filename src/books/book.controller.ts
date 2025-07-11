@@ -223,7 +223,7 @@ export class BookController {
     res.render('book-view', { book, user });
   }
 
-  @Protected({ adminOnly: true })
+  @Protected()
   @Post('/books/:id/bookmark')
   async toggleBookmark(
     @Param('id', new ParseIntPipe()) bookId: number,
