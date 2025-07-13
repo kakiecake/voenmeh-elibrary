@@ -60,6 +60,7 @@ export class BookController {
 
     const isEnd = books.length < API_PAGE_SIZE;
     res.render(query.partial ? 'partials/book-list' : 'books', {
+      title: 'Электронная библиотека',
       query: query.q,
       books,
       user,
@@ -220,7 +221,7 @@ export class BookController {
   ) {
     const book = await this.bookService.getBookForUser(id, user?.id ?? null);
     if (!book) return res.render('404', { message: 'Book not found' });
-    res.render('book-view', { book, user });
+    res.render('book-view', { title: book.title, book, user });
   }
 
   @Protected()

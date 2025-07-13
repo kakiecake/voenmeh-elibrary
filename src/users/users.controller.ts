@@ -62,7 +62,7 @@ export class UserController {
   async register(@Body() body: RegisterDto, @Res() res: Response) {
     const result = await this.userService.register(body.email, body.password);
     if (!result) {
-      return res.render('authForm', {
+      return res.render('partials/auth-form', {
         authError: 'Пользователь с таким email адресом уже зарегистрирован',
       });
     }

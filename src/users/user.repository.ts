@@ -35,7 +35,9 @@ export class UserRepository {
       .returning<[Pick<User, 'id' | 'createdAt'>]>([
         'id',
         'created_at AS "createdAt"',
-      ]);
+      ])
+      .onConflict('email')
+      .ignore();
     return user ?? null;
   }
 }
