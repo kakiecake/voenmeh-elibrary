@@ -18,6 +18,3 @@ $ pnpm run start:dev
 # для обработки стилей
 $ pnpm tailwind
 ```
-```
-```
-```
